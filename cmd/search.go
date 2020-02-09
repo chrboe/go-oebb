@@ -288,10 +288,20 @@ var searchCmd = &cobra.Command{
 		}
 
 		var depTime time.Time
-		if depTimeStr == "" {
-			depTime = time.Now()
-		} else {
+		depTime = time.Now()
+
+		if strings.Contains(depTimeStr, ":") && len(depTimeStr) == 5 {
 			depTime, err = time.Parse("15:04", depTimeStr)
+			if err != nil {
+				s.Stop()
+				panic(err)
+			}
+
+			now := time.Now()
+			depTime = depTime.AddDate(now.Year(), int(now.Month())-1, now.Day()-1)
+		}
+		if !strings.Contains(depTimeStr, ":") && len(depTimeStr) == 4 {
+			depTime, err = time.Parse("1504", depTimeStr)
 			if err != nil {
 				s.Stop()
 				panic(err)
